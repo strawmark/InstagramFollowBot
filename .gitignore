@@ -162,4 +162,4 @@ cython_debug/
 #.idea/
 
 # Script specific
-user_data.txt
+user_data.json
