@@ -1,1 +1,6 @@
-{"username": "username", "password": "password", "otp_secret": "ABC1ABC2ABC3ABC4"}
+{
+  "username": "username",
+  "password": "password",
+  "otp_secret": "ABC1ABC2ABC3ABC4",
+  "target": "target_username"
+}

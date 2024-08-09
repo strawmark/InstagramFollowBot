@@ -1,5 +1,6 @@
-import pyotp
 import credentials
+
+import pyotp
 from random import randint
 from time import sleep
 
@@ -15,6 +16,8 @@ driver = webdriver.Edge(options=browser_options)
 driver.get("https://www.instagram.com")
 driver.implicitly_wait(10)
 
+credentials = credentials.get()
+
 # Reject cookies
 try:
     reject_cookie_button = driver.find_element(By.CSS_SELECTOR, value='button._a9--._ap36._a9_1')
@@ -23,7 +26,6 @@ except NoSuchElementException:
     pass
 
 # Login
-credentials = credentials.get()
 
 try:
     login_entries = driver.find_elements(By.CSS_SELECTOR, value='#loginForm input')
@@ -84,3 +86,44 @@ try:
 except NoSuchElementException:
     exit(1)
 
+# Gather followers
+
+target = credentials['target']
+
+driver.get(f"https://instagram.com/{target}/")
+
+follower_button = driver.find_element(By.CSS_SELECTOR,value=f"[href='/{target}/followers/']")
+follower_button.click()
+sleep(3)
+
+followers_popup = driver.find_element(By.CSS_SELECTOR, value=".xyi19xy")
+
+for i in range(10):
+    driver.execute_script("arguments[0].scrollTop = arguments[0].scrollHeight", followers_popup)
+    sleep(2)
+
+sleep(3)
+
+followers = driver.find_elements(By.CSS_SELECTOR, value=".x1dm5mii")
+
+followers_dict = [{'link': follower.find_element(By.CSS_SELECTOR, value='.x1rg5ohu a'),
+                   'button': follower.find_element(By.CSS_SELECTOR,value=".xyi19xy [type='button']")} for follower in followers]
+
+#Logout
+
+driver.get(f"https://instagram.com/{target}/")
+try:
+    menu_button = driver.find_element(By.CSS_SELECTOR,value="[aria-describedby=':rc:']")
+    menu_button.click()
+    sleep(2)
+    menu_popup = driver.find_element(By.CSS_SELECTOR,"div.xq9evs9")
+
+    popup_buttons = menu_popup.find_elements(By.CSS_SELECTOR, value='[role="button"]')
+    quit_button = popup_buttons[-1]
+    quit_button.click()
+
+except NoSuchElementException:
+    exit(1)
+finally:
+    sleep(2)
+    driver.quit()
